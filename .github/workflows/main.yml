@@ -68,9 +68,14 @@ jobs:
     needs: [test, build, determine_author_email]
     if: always()
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
       - name: Send email notification
-        run: |
-          python send_email.py
+        run: python send_email.py
         env:
           EMAIL_RECIPIENT: ${{ needs.determine_author_email.outputs.author_email }}
           PIPELINE_STATUS: ${{ job.status }}
