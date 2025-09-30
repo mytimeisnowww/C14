@@ -82,19 +82,26 @@ jobs:
 
   notify:
     runs-on: ubuntu-latest
-    needs: [test, build, determine_author_email]
-    if: always()
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
+      - name: Get Commit Author Email
+        id: get_email
+        run: |
+          echo "COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_ENV
 
-      - name: Send email notification
-        run: python send_email.py
+      - name: Set UTF-8 Encoding
+        run: |
+          export PYTHONIOENCODING=utf-8
+          printenv
+
+      - name: Send Email Notification
+        run: |
+          python send_email.py
         env:
-          EMAIL_RECIPIENT: ${{ needs.determine_author_email.outputs.author_email }}
-          PIPELINE_STATUS: ${{ job.status }}
+          EMAIL_RECIPIENT: ${{ env.COMMIT_AUTHOR_EMAIL }}
+          PIPELINE_STATUS: success
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_EMAIL_PASSWORD: ${{ secrets.SENDER_EMAIL_PASSWORD }}
