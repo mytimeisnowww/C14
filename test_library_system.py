@@ -1,5 +1,5 @@
 import unittest
-from library_system import Livro, Membro, Biblioteca
+from C14.library_system import Livro, Membro, Biblioteca
 
 
 class TestLivro(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestLivro(unittest.TestCase):
     # Testes Negativos
     def test_emprestar_livro_negativo_ja_emprestado(self):
         livro = Livro("Livro C", "Autor C", "ISBN003")
-        livro.emprestar()
+        livro.emprestar()  # Livro já emprestado
         self.assertFalse(livro.emprestar())
 
     def test_devolver_livro_negativo_ja_disponivel(self):
@@ -160,6 +160,20 @@ class TestBiblioteca(unittest.TestCase):
         self.assertFalse(self.biblioteca.devolver_livro(
             self.livro1.isbn, self.membro1.id_membro))
 
+    def test_buscar_livro_negativo_nao_existe(self):
+        self.assertIsNone(self.biblioteca.buscar_livro("ISBN_INEXISTENTE"))
+
+    def test_buscar_membro_negativo_nao_existe(self):
+        self.assertIsNone(self.biblioteca.buscar_membro("ID_INEXISTENTE"))
+
+    def test_emprestar_livro_membro_negativo_livro_ja_emprestado_pelo_mesmo_membro(self):
+        membro = Membro("Membro Teste", "IDT01")
+        livro = Livro("Livro Teste", "Autor Teste", "ISBNT01")
+        membro.emprestar_livro(livro)
+        self.assertFalse(membro.emprestar_livro(livro))
+
 
 if __name__ == '__main__':
     unittest.main()
+
+

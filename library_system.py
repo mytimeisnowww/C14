@@ -91,3 +91,28 @@ class Biblioteca:
 
     def buscar_membro(self, id_membro):
         return self.membros.get(id_membro)
+
+def main():
+    print("Sistema de Biblioteca iniciado.")
+    # Exemplo de uso:
+    biblioteca = Biblioteca()
+    livro1 = Livro("O Senhor dos Anéis", "J.R.R. Tolkien", "978-85-333-0227-3")
+    membro1 = Membro("Alice", "M001")
+
+    biblioteca.adicionar_livro(livro1)
+    biblioteca.adicionar_membro(membro1)
+
+    if biblioteca.emprestar_livro(livro1.isbn, membro1.id_membro):
+        print(f"{membro1.nome} emprestou \"{livro1.titulo}\".")
+    else:
+        print(f"{membro1.nome} não conseguiu emprestar \"{livro1.titulo}\".")
+
+    if biblioteca.devolver_livro(livro1.isbn, membro1.id_membro):
+        print(f"{membro1.nome} devolveu \"{livro1.titulo}\".")
+    else:
+        print(f"{membro1.nome} não conseguiu devolver \"{livro1.titulo}\".")
+
+if __name__ == "__main__":
+    main()
+
+
