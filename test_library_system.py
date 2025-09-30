@@ -1,5 +1,5 @@
 import unittest
-from C14.library_system import Livro, Membro, Biblioteca
+from library_system import Livro, Membro, Biblioteca
 
 
 class TestLivro(unittest.TestCase):
@@ -175,5 +175,3 @@ class TestBiblioteca(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
