@@ -26,14 +26,8 @@ jobs:
         run: |
           RAW="${{ steps.raw.outputs.email }}"
           PUB="${{ steps.user.outputs.public_email }}"
-          if [[ -n "$RAW" && "$RAW" != *"noreply.github.com"* ]]; then
-            FINAL="$RAW"
-          elif [[ -n "$PUB" && "$PUB" != *"noreply.github.com"* ]]; then
-            FINAL="$PUB"
-          fi
-          if [[ -z "$FINAL" ]]; then
-            exit 1
-          fi
+          FINAL="$RAW"
+          [[ -z "$FINAL" || "$FINAL" == "" ]] && FINAL="$PUB"
           echo "email=$FINAL" >> $GITHUB_OUTPUT
 
   test:
