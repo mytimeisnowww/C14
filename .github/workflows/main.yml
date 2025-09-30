@@ -6,18 +6,35 @@ jobs:
   determine_author_email:
     runs-on: ubuntu-latest
     outputs:
-      author_email: ${{ steps.get_email.outputs.email }}
+      author_email: ${{ steps.pick.outputs.email }}
     steps:
-      - name: Get author email
-        id: get_email
+      - uses: actions/checkout@v4
+      - id: raw
         run: |
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "email=${{ github.event.pusher.email }}" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "email=${{ github.event.pull_request.user.email }}" >> $GITHUB_OUTPUT
-          else
-            echo "email=default@example.com" >> $GITHUB_OUTPUT # Fallback
+          EMAIL="${{ github.event.head_commit.author.email }}"
+          [[ -z "$EMAIL" ]] && EMAIL="${{ github.event.pusher.email }}"
+          [[ -z "$EMAIL" ]] && EMAIL="$(git log -1 --pretty=format:'%ae' 2>/dev/null || true)"
+          echo "email=$EMAIL" >> $GITHUB_OUTPUT
+      - id: user
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const login = context.payload.pull_request?.user?.login || context.actor
+            const user = await github.rest.users.getByUsername({ username: login })
+            core.setOutput('public_email', user.data.email || '')
+      - id: pick
+        run: |
+          RAW="${{ steps.raw.outputs.email }}"
+          PUB="${{ steps.user.outputs.public_email }}"
+          if [[ -n "$RAW" && "$RAW" != *"noreply.github.com"* ]]; then
+            FINAL="$RAW"
+          elif [[ -n "$PUB" && "$PUB" != *"noreply.github.com"* ]]; then
+            FINAL="$PUB"
           fi
+          if [[ -z "$FINAL" ]]; then
+            exit 1
+          fi
+          echo "email=$FINAL" >> $GITHUB_OUTPUT
 
   test:
     runs-on: ubuntu-latest
