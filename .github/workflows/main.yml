@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   determine_author_email:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
     outputs:
       author_email: ${{ steps.pick.outputs.email }}
     steps:
